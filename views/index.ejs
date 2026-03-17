@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Weather App</title>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    </head>
+    <body style="--bg-image: url('/images/<% if (locals.bgImage) { %><%= locals.bgImage %><% } else { %>clear-day.jpg<% } %>');">        
+        <div class = 'info'>
+            <h1 class="city"><% if (locals.city) { %><%= locals.city %><% } else { %>City not found<% } %></h1>
+            <h1 class="temperature"><% if (locals.current) { %><%= locals.current.temperature_2m %>°C<% } else { %>Temperature not available<% } %></h1>
+            <h1 class="feels-like">Feels Like: <% if (locals.current) { %><%= locals.current.apparent_temperature %>°C<% } else { %>Not available<% } %></h1>
+            <h1 class="description"><% if (locals.description) { %><%= locals.description %><% } else { %>Description not available<% } %></h1>
+            <h1 class="humidity">Humidity: <% if (locals.current) { %><%= locals.current.relative_humidity_2m %>%<% } else { %>Not available<% } %></h1>
+            <h1 class="wind-speed">Wind Speed: <% if (locals.current) { %><%= locals.current.wind_speed_10m %> km/h<% } else { %>Not available<% } %></h1>
+        </div>
+        <script>
+            if (window.location.pathname !== '/weather') {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+                        },
+                        (error) => {
+                            console.log("Location access denied or failed, loading default city.");
+                            const defaultLat = 22.5958; 
+                            const defaultLon = 88.3110;
+                            window.location.href = `/weather?lat=${defaultLat}&lon=${defaultLon}`;
+                        }
+                    );
+                } else {
+                    console.log("Geolocation is not available in this browser. Loading default city.");
+                    const defaultLat = 22.5958; 
+                    const defaultLon = 88.3110; 
+                    window.location.href = `/weather?lat=${defaultLat}&lon=${defaultLon}`;
+                }
+            }
+        </script>
+    </body>
+</html>

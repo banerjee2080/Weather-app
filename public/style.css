@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-image: url("./images/sunny.jpg");
+    --text-color: #ffffff; 
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #87CEEB; 
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    padding: 40px 50px;
+    min-width: 320px;
+
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(16px); 
+    -webkit-backdrop-filter: blur(16px); 
+    border-radius: 24px; 
+    border: 1px solid rgba(255, 255, 255, 0.4); 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    
+    color: var(--text-color); 
+    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); 
+    
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+
+.city {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.temperature {
+    font-size: 5rem;
+    font-weight: 200;
+    line-height: 1;
+}
+
+.feels-like {
+    font-size: 1.1rem;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-bottom: 15px;
+}
+
+.description {
+    font-size: 1.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    margin-bottom: 15px;
+}
+
+.humidity, 
+.wind-speed {
+    font-size: 1.1rem;
+    font-weight: 400;
+    background: rgba(0, 0, 0, 0.15); 
+    border-radius: 20px;
+    width: 100%; 
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
