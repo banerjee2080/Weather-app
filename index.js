@@ -1,4 +1,3 @@
-import { fetchWeatherApi } from "openmeteo";
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
@@ -35,41 +34,24 @@ function getWeatherDescription(code) {
     }
 }
 
-function getimg(code, isday){
-    if(isday === 1){
-        if (code === 0) {
-            return "clear-day.jpg";
-        } 
-        else if (code === 1 || code === 2 || code === 3) {
-            return "cloudy-day.jpg";
-        } 
-        else if (code >= 51 && code <= 67) {
-            return "rainy-day.jpg";
-         } 
-        else if (code >= 71 && code <= 77) {
-            return "snow-day.jpg";
-        }
-        else if (code >= 95 && code <= 99) {
-            return "thunderstorm.jpg";
-        }
-    } 
-    else {
-        if (code === 0) {
-            return "clear-night.jpg";
-        } 
-        else if (code === 1 || code === 2 || code === 3) {
-            return "cloudy-night.jpg";
-        } 
-        else if (code >= 51 && code <= 67) {
-            return "rainy-night.jpg";
-         } 
-        else if (code >= 71 && code <= 77) {
-            return "snow-night.jpg";
-        }
-        else if (code >= 95 && code <= 99) {
-            return "thunderstorm.jpg";
-        }
-    }        
+function getimg(code, isday) {
+    let imageName = "";
+
+    if (code === 0) {
+        imageName = "clear";
+    } else if ((code >= 1 && code <= 3) || code === 45 || code === 48) {
+        imageName = "cloudy";
+    } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+        imageName = "rainy";
+    } else if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
+        imageName = "snow";
+    } else if (code >= 95 && code <= 99) {
+        imageName = "thunderstorm"; 
+    } else {
+        imageName = "clear";
+    }
+
+    return isday === 1 ? `${imageName}-day.jpg` : `${imageName}-night.jpg`;
 }
 
 const app = express();
@@ -82,7 +64,7 @@ const url = "https://api.open-meteo.com/v1/forecast";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-    res.render("index");
+    res.render("home.ejs");
 });
 
 app.get("/weather", async (req, res)=>{
@@ -105,9 +87,7 @@ app.get("/weather", async (req, res)=>{
         const bgImageName = getimg(current.weather_code, current.is_day);
         const weatherDesc = getWeatherDescription(current.weather_code);
 
-        console.log(`\nCoordinates: ${data.latitude}°N ${data.longitude}°E`);
-        console.log(`\nCity: ${name.data.address.city || name.data.address.town || name.data.address.village}`);
-        
+        console.log(`\nCoordinates: ${data.latitude}°N ${data.longitude}°E`);        
         console.log(`\nCurrent time: ${current.time}`);
         console.log(`Current temperature: ${current.temperature_2m}°C`);
         console.log(`Current relative_humidity_2m: ${current.relative_humidity_2m}mm`);
@@ -116,8 +96,21 @@ app.get("/weather", async (req, res)=>{
         console.log(`Current weather code: ${current.weather_code}`);
         console.log(`Current wind speed: ${current.wind_speed_10m} km/h`);
 
+        const addressInfo = name.data.address || {};
+        const locationName = 
+            addressInfo.city || 
+            addressInfo.town || 
+            addressInfo.village || 
+            addressInfo.suburb || 
+            addressInfo.county || 
+            addressInfo.state || 
+            addressInfo.country || 
+            "Unknown Location";
+
+        console.log(`\nCity: ${locationName}`);
+
         res.render("index", { 
-            city: name.data.address.city || name.data.address.town || name.data.address.village, 
+            city: locationName, 
             current: current,
             description: weatherDesc,
             bgImage: bgImageName

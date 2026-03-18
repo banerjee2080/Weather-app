@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        <link rel="stylesheet" href="/style1.css">
+    </head>
+    <body>
+        <div class="location">
+            <form action="/weather" method="GET">
+                <h2>Enter Latitude and Longitude</h2>
+                <input type="text" name="lat" placeholder="Latitude" required>
+                <input type="text" name="lon" placeholder="Longitude" required>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        
+        <button id="getLocation">Get Location</button>
+
+        <script>
+            document.getElementById('getLocation').addEventListener('click', function() {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+                        },
+                        (error) => {
+                            console.log("Location access denied or failed, loading default city.");
+                            const defaultLat = 22.5958; 
+                            const defaultLon = 88.3110;
+                            window.location.href = `/weather?lat=${defaultLat}&lon=${defaultLon}`;
+                        }
+                    );
+                } else {
+                    console.log("Geolocation is not available in this browser. Loading default city.");
+                    const defaultLat = 22.5958; 
+                    const defaultLon = 88.3110; 
+                    window.location.href = `/weather?lat=${defaultLat}&lon=${defaultLon}`;
+                }
+            });
+        </script>
+    </body>
+</html>
