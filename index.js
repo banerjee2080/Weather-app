@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import "dotenv/config";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 function getWeatherDescription(code, isday = 1) {
     const descriptions = {
