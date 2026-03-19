@@ -1,54 +1,83 @@
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
+import "dotenv/config";
 
-function getWeatherDescription(code) {
-    if (code === 0) {
-        return "Clear Sky";
-    } else if (code === 1 || code === 2 || code === 3) {
-        return "Mainly Clear to Overcast";
-    } else if (code === 45 || code === 48) {
-        return "Fog";
-    } else if (code === 51 || code === 53 || code === 55) {
-        return "Drizzle";
-    } else if (code === 56 || code === 57) {
-        return "Freezing Drizzle";
-    } else if (code === 61 || code === 63 || code === 65) {
-        return "Rain";
-    } else if (code === 66 || code === 67) {
-        return "Freezing Rain";
-    } else if (code === 71 || code === 73 || code === 75) {
-        return "Snow";
-    } else if (code === 77) {
-        return "Snow Grains";
-    } else if (code === 80 || code === 81 || code === 82) {
-        return "Rain Showers";
-    } else if (code === 85 || code === 86) {
-        return "Snow Showers";
-    } else if (code === 95) {
-        return "Thunderstorm";
-    } else if (code === 96 || code === 99) {
-        return "Thunderstorm with Hail";
-    } else {
-        return "Unknown Weather";
-    }
+function getWeatherDescription(code, isday = 1) {
+    const descriptions = {
+        1000: isday === 1 ? "Sunny" : "Clear",
+        1003: "Partly cloudy",
+        1006: "Cloudy",
+        1009: "Overcast",
+        1030: "Mist",
+        1063: "Patchy rain possible",
+        1066: "Patchy snow possible",
+        1069: "Patchy sleet possible",
+        1072: "Patchy freezing drizzle possible",
+        1087: "Thundery outbreaks possible",
+        1114: "Blowing snow",
+        1117: "Blizzard",
+        1135: "Fog",
+        1147: "Freezing fog",
+        1150: "Patchy light drizzle",
+        1153: "Light drizzle",
+        1168: "Freezing drizzle",
+        1171: "Heavy freezing drizzle",
+        1180: "Patchy light rain",
+        1183: "Light rain",
+        1186: "Moderate rain at times",
+        1189: "Moderate rain",
+        1192: "Heavy rain at times",
+        1195: "Heavy rain",
+        1198: "Light freezing rain",
+        1201: "Moderate or heavy freezing rain",
+        1204: "Light sleet",
+        1207: "Moderate or heavy sleet",
+        1210: "Patchy light snow",
+        1213: "Light snow",
+        1216: "Patchy moderate snow",
+        1219: "Moderate snow",
+        1222: "Patchy heavy snow",
+        1225: "Heavy snow",
+        1237: "Ice pellets",
+        1240: "Light rain shower",
+        1243: "Moderate or heavy rain shower",
+        1246: "Torrential rain shower",
+        1249: "Light sleet showers",
+        1252: "Moderate or heavy sleet showers",
+        1255: "Light snow showers",
+        1258: "Moderate or heavy snow showers",
+        1261: "Light showers of ice pellets",
+        1264: "Moderate or heavy showers of ice pellets",
+        1273: "Patchy light rain with thunder",
+        1276: "Moderate or heavy rain with thunder",
+        1279: "Patchy light snow with thunder",
+        1282: "Moderate or heavy snow with thunder"
+    };
+
+    return descriptions[code] || "Unknown Weather";
 }
 
 function getimg(code, isday) {
     let imageName = "";
 
-    if (code === 0) {
+    const cloudyCodes = [1003, 1006, 1009, 1030, 1135, 1147];
+    const rainCodes = [1063, 1072, 1150, 1153, 1168, 1171, 1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246];
+    const snowCodes = [1066, 1069, 1114, 1117, 1204, 1207, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1249, 1252, 1255, 1258, 1261, 1264];
+    const thunderCodes = [1087, 1273, 1276, 1279, 1282];
+
+    if (code === 1000) {
         imageName = "clear";
-    } else if ((code >= 1 && code <= 3) || code === 45 || code === 48) {
+    } else if (cloudyCodes.includes(code)) {
         imageName = "cloudy";
-    } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+    } else if (rainCodes.includes(code)) {
         imageName = "rainy";
-    } else if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
+    } else if (snowCodes.includes(code)) {
         imageName = "snow";
-    } else if (code >= 95 && code <= 99) {
-        imageName = "thunderstorm"; 
+    } else if (thunderCodes.includes(code)) {
+        imageName = "thunderstorm";
     } else {
-        imageName = "clear";
+        imageName = "clear"; // Fallback for unknown codes
     }
 
     return isday === 1 ? `${imageName}-day.jpg` : `${imageName}-night.jpg`;
@@ -56,66 +85,51 @@ function getimg(code, isday) {
 
 const app = express();
 const port = process.env.PORT || 3000;
+const key = process.env.WEATHER_API_KEY;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-const url = "https://api.open-meteo.com/v1/forecast";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.render("home.ejs");
 });
 
+app.get("/weather-place", async (req, res) => {
+    try{
+        const place = req.query.place;
+        const response = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${key}&q=${place}&aqi=no`);
+        const data = response.data;
+        const current = data.current;
+        const location = data.location.name + ", " + data.location.region + ", " + data.location.country;
+        res.render("index", { 
+            city: location, 
+            current: current,
+            description: getWeatherDescription(current.condition.code, current.is_day),
+            bgImage: getimg(current.condition.code, current.is_day)
+        });
+    } catch (error) {
+        console.error("Error fetching weather data:", error.message);
+        res.status(500).send("Error fetching weather data. Please try again later.");
+    }
+});
 app.get("/weather", async (req, res)=>{
     try {
         const { lat, lon } = req.query;
-        const params = {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lon),
-            current: ["temperature_2m", "relative_humidity_2m", "rain", "apparent_temperature", "weather_code", "wind_speed_10m", "is_day"].join(',') 
-        };
-        const name = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
-            headers: {
-                'User-Agent': 'MyWeatherApp/1.0 (banerjee2110@gmail.com)' 
-            }
-        });
-        const response = await axios.get(url, { params });    
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lon);
+        const response = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${key}&q=${latitude},${longitude}&aqi=no`);
         const data = response.data;
         const current = data.current;
-
-        const bgImageName = getimg(current.weather_code, current.is_day);
-        const weatherDesc = getWeatherDescription(current.weather_code);
-
-        console.log(`\nCoordinates: ${data.latitude}°N ${data.longitude}°E`);        
-        console.log(`\nCurrent time: ${current.time}`);
-        console.log(`Current temperature: ${current.temperature_2m}°C`);
-        console.log(`Current relative_humidity_2m: ${current.relative_humidity_2m}mm`);
-        console.log(`Current rain: ${current.rain}mm`);
-        console.log(`Current apparent temperature: ${current.apparent_temperature}°C`);
-        console.log(`Current weather code: ${current.weather_code}`);
-        console.log(`Current wind speed: ${current.wind_speed_10m} km/h`);
-
-        const addressInfo = name.data.address || {};
-        const locationName = 
-            addressInfo.city || 
-            addressInfo.town || 
-            addressInfo.village || 
-            addressInfo.suburb || 
-            addressInfo.county || 
-            addressInfo.state || 
-            addressInfo.country || 
-            "Unknown Location";
-
-        console.log(`\nCity: ${locationName}`);
-
+        const location = data.location.name + ", " + data.location.region + ", " + data.location.country;
         res.render("index", { 
-            city: locationName, 
+            city: location, 
             current: current,
-            description: weatherDesc,
-            bgImage: bgImageName
+            description: getWeatherDescription(current.condition.code, current.is_day),
+            bgImage: getimg(current.condition.code, current.is_day)
         });
-    }catch (error) {
+    } catch (error) {
         console.error("Error fetching weather data:", error.message);
         res.status(500).send("Error fetching weather data. Please try again later.");
     }
