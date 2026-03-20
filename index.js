@@ -75,7 +75,7 @@ function getimg(code, isday) {
     } else if (snowCodes.includes(code)) {
         imageName = "snow";
     } else if (thunderCodes.includes(code)) {
-        imageName = "thunderstorm";
+        return "thunderstorm.jpg"; // Thunder has a unique image regardless of day/night
     } else {
         imageName = "clear"; // Fallback for unknown codes
     }
