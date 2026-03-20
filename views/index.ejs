@@ -15,8 +15,8 @@
             <h1 class="temperature"><% if (locals.current) { %><%= locals.current.temp_c %>°C<% } else { %>Temperature not available<% } %></h1>
             <h1 class="feels-like">Feels Like: <% if (locals.current) { %><%= locals.current.feelslike_c %>°C<% } else { %>Not available<% } %></h1>
             <h1 class="description"><% if (locals.description) { %><%= locals.description %><% } else { %>Description not available<% } %></h1>
-            <h1 class="humidity">Humidity: <% if (locals.current) { %><%= locals.current.humidity %>%<% } else { %>Not available<% } %></h1>
-            <h1 class="wind-speed">Wind Speed: <% if (locals.current) { %><%= locals.current.wind_kph %> km/h<% } else { %>Not available<% } %></h1>
+            <h1 class="humidity"><b>Humidity:</b> <% if (locals.current) { %><%= locals.current.humidity %>%<% } else { %>Not available<% } %></h1>
+            <h1 class="wind-speed"><b>Wind Speed:</b> <% if (locals.current) { %><%= locals.current.wind_kph %> km/h<% } else { %>Not available<% } %></h1>
         </div>
     </body>
 </html>

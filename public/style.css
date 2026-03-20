@@ -81,6 +81,7 @@ body {
 
 .humidity, 
 .wind-speed {
+    padding: 10px;
     font-size: 1.1rem;
     font-weight: 400;
     background: rgba(0, 0, 0, 0.15); 
