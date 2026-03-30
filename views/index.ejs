@@ -9,7 +9,10 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     </head>
-    <body style="--bg-image: url('/images/<% if (locals.bgImage) { %><%= locals.bgImage %><% } else { %>clear-day.jpg<% } %>');">        
+    <body style="--bg-image: url('/images/<% if (locals.bgImage) { %><%= locals.bgImage %><% } else { %>clear-day.jpg<% } %>');">
+        <form action="/" method="get" class="back-form">
+            <button type="submit" class="back-btn">Back</button>
+        </form>        
         <div class = 'info'>
             <h1 class="city"><% if (locals.city) { %><%= locals.city %><% } else { %>City not found<% } %></h1>
             <h1 class="temperature"><% if (locals.current) { %><%= locals.current.temp_c %>°C<% } else { %>Temperature not available<% } %></h1>
