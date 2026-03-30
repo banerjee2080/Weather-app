@@ -75,12 +75,12 @@ function getimg(code, isday) {
     } else if (snowCodes.includes(code)) {
         imageName = "snow";
     } else if (thunderCodes.includes(code)) {
-        return "thunderstorm.jpg"; // Thunder has a unique image regardless of day/night
+        return "thunderstorm.webp"; // Thunder has a unique image regardless of day/night
     } else {
         imageName = "clear"; // Fallback for unknown codes
     }
 
-    return isday === 1 ? `${imageName}-day.jpg` : `${imageName}-night.jpg`;
+    return isday === 1 ? `${imageName}-day.webp` : `${imageName}-night.webp`;
 }
 
 const app = express();
